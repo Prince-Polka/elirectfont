@@ -22,7 +22,6 @@ void setfloatarray(PShader target, String sampler2Dname, float[][] source){
 void setup(){
   size(500,500,P2D);
   blablabla = loadShader("blablabla.frag");
-  //font = loadXML("twoelis.svg");
   font = loadXML("AZazlayered.svg");
   glyphs = font.getChildren("g");
   for (int i = 0; i < glyphs.length; i++) {
@@ -249,9 +248,10 @@ void setup(){
     }
   }
   setfloatarray(blablabla,"glyphs",glyphimg);
+  shader(blablabla);
   //println(index);
 }
 void draw(){
-  shader(blablabla);
+  blablabla.set("u_seconds",second()%22 );
   rect(0,0,width,height);
 }

@@ -6,6 +6,7 @@ precision mediump float;
 #endif
 
 uniform sampler2D glyphs;
+uniform int u_seconds;
 
 float elirect(vec2 st, mat3 e, float background){
     st = (vec3(st,1) * e).xy;
@@ -68,7 +69,9 @@ void main() {
 
     float color = 0.0;
 
-    int g = 97-33;
+    int g = 97-33 +u_seconds;
+
+    g-=int(st.y<250)*32;
 
     //g += int( dot(st/vec2(100,200),vec2(1,5));
 
