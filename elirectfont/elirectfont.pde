@@ -26,7 +26,7 @@ void setup(){
   glyphs = font.getChildren("g");
   for (int i = 0; i < glyphs.length; i++) {
     String id = glyphs[i].getString("inkscape:label");
-    if (id.length()==1){
+    if (id.length()==1 ){
     index = 0;
     gi = (int)id.charAt(0)-33;
     shapes = glyphs[i].getChildren();
@@ -65,10 +65,10 @@ void setup(){
         
         float ang = radians(a);
         float sina = sin(ang), cosa = cos(ang);
-        a = d = cosa; // for sure
-        e = -(b*cosa + c*-sina - b); // e and f not used
+        a = d = cosa;
+        e = -(b*cosa + c*-sina - b);
         f = -(b*sina + c*cosa - c);
-        b = sina; c = -sina; // may be switched
+        b = sina; c = -sina;
         /*
         rotate(a,x,y)
         a = radians(a)
@@ -136,6 +136,35 @@ void setup(){
         glyphimg[gi][index*9 + 7] = 0.0;
         glyphimg[gi][index*9 + 8] = 0.0;
         
+        float A,C,E,
+              B,D,F;
+              
+        A = d / determinant;
+        C = -c / determinant;
+        B = -b / determinant;
+        D = a / determinant;
+        
+        E=-cx;
+        F=-cy;
+        
+        E -= e * A + f * C;
+        F -= e * B + f * D;
+        
+        
+        
+        glyphimg[gi][index*9    ] = A/rx;
+        glyphimg[gi][index*9 + 1] = C/rx;
+        glyphimg[gi][index*9 + 2] = E/rx;
+        //glyphimg[gi][index*9 + 2] = -m02;
+        
+        glyphimg[gi][index*9 + 3] = B/ry;
+        glyphimg[gi][index*9 + 4] = D/ry;
+        glyphimg[gi][index*9 + 5] = F/ry;
+        //glyphimg[gi][index*9 + 5] = -m12;
+        
+        glyphimg[gi][index*9 + 6] = addsub;
+        glyphimg[gi][index*9 + 7] = 0.0;
+        
 
         //println(a,b,c,d,e,f);
         
@@ -181,10 +210,10 @@ void setup(){
         
         float ang = radians(a);
         float sina = sin(ang), cosa = cos(ang);
-        a = d = cosa; // for sure
-        e = -(b*cosa + c*-sina - b); // e and f not used
+        a = d = cosa;
+        e = -(b*cosa + c*-sina - b);
         f = -(b*sina + c*cosa - c);
-        b = sina; c = -sina; // may be switched
+        b = sina; c = -sina;
         }
         else if(t!=null && t.contains("translate") ){
         t = t.substring(10,t.length()-1);
@@ -204,23 +233,69 @@ void setup(){
           c = 0.0;
           d = 1.0;
         }
-        x+=e;
-        f+=f;
         
-
         float determinant = a*d - c*b;
         
-        glyphimg[gi][index*9    ] = d / determinant / w;
-        glyphimg[gi][index*9 + 1] = -c / determinant / w;
-        glyphimg[gi][index*9 + 2] = -(w + x) / w;
+        /*
+        https://github.com/processing/processing-android/blob/master/core/src/processing/core/PMatrix2D.java
         
-        glyphimg[gi][index*9 + 3] = -b / determinant / h;
-        glyphimg[gi][index*9 + 4] = a / determinant / h;
-        glyphimg[gi][index*9 + 5] = -(h + y) / h;
+        translate
+        m02 = tx*m00 + ty*m01 + m02;
+        m12 = tx*m10 + ty*m11 + m12;
+        
+        invert
+  
+        float m02,m12;
+        e -= w+x;
+        f -= h+y;
+        m02 = (c * f - d * e) / determinant / w;
+        m12 = (b * e - a * f) / determinant / h;
+        
+        m02 = (t01 * t12 - t11 * t02) / determinant;
+        m12 = (t10 * t02 - t00 * t12) / determinant;
+        */
+        
+        x+=w;
+        y+=h;
+        
+        //x+=e * a + f * c;
+        //y+=e * b + f * d;
+        //x+=w * a + h * c;
+        //y+=w * b + h * d;
+        
+        float m02,m12;
+        m02 = (c * f - d * e) / determinant;
+        m12 = (b * e - a * f) / determinant;
+        
+        float A,C,E,
+              B,D,F;
+              
+        A = d / determinant;
+        C = -c / determinant;
+        B = -b / determinant;
+        D = a / determinant;
+        
+        E=-x;
+        F=-y;
+        
+        E -= e * A + f * C;
+        F -= e * B + f * D;
+        
+        
+        
+        glyphimg[gi][index*9    ] = A/w;
+        glyphimg[gi][index*9 + 1] = C/w;
+        glyphimg[gi][index*9 + 2] = E/w;
+        //glyphimg[gi][index*9 + 2] = -m02;
+        
+        glyphimg[gi][index*9 + 3] = B/h;
+        glyphimg[gi][index*9 + 4] = D/h;
+        glyphimg[gi][index*9 + 5] = F/h;
+        //glyphimg[gi][index*9 + 5] = -m12;
         
         glyphimg[gi][index*9 + 6] = addsub;
         glyphimg[gi][index*9 + 7] = 1.0;
-        glyphimg[gi][index*9 + 8] = 0.0;
+        //glyphimg[gi][index*9 + 8] = 0.0;
         /*
         print( "a["+index+"] = new_rect(");
         print(a+","+b+","+c+","+d+","+t);
@@ -252,6 +327,7 @@ void setup(){
   //println(index);
 }
 void draw(){
-  blablabla.set("u_seconds",second()%22 );
+  int sec = frameCount/30;
+  blablabla.set("u_seconds",sec%22 + 32 * int(sec<22)  );
   rect(0,0,width,height);
 }

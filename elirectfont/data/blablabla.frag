@@ -69,9 +69,11 @@ void main() {
 
     float color = 0.0;
 
-    int g = 97-33 +u_seconds;
+    int g = 65-33 +u_seconds;
 
-    g-=int(st.y<250)*32;
+    //g-=32;
+
+    //g-= int(st.y<250.0) *32;
 
     //g += int( dot(st/vec2(100,200),vec2(1,5));
 
