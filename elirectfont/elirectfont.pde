@@ -108,65 +108,11 @@ void setup(){
           c = 0.0;
           d = 1.0;
         }
-        
-        determinant = a*d - c*b;
-        
-        //cx+=e;
-        //cy+=f;
-        
-        //d /= determinant;
-        //c = -c / determinant;
-        //cx=determinant*100+cx;
-        //cy-=-b*100 - a*100 +100;
-        //cx += a*100;
-        //cx = (c * cy - d * cx) /determinant;
-        //cy = (b * cx - a * cy) /determinant;
-
-        
-        
-        glyphimg[gi][index*9    ] = d / determinant / rx;
-        glyphimg[gi][index*9 + 1] = -c / determinant / rx;
-        glyphimg[gi][index*9 + 2] = -cx / rx;
-        
-        glyphimg[gi][index*9 + 3] = -b / determinant / ry;
-        glyphimg[gi][index*9 + 4] = a / determinant / ry;
-        glyphimg[gi][index*9 + 5] = -cy /ry;
-        
-        glyphimg[gi][index*9 + 6] = addsub;
-        glyphimg[gi][index*9 + 7] = 0.0;
-        glyphimg[gi][index*9 + 8] = 0.0;
-        
-        float A,C,E,
-              B,D,F;
-              
-        A = d / determinant;
-        C = -c / determinant;
-        B = -b / determinant;
-        D = a / determinant;
-        
-        E=-cx;
-        F=-cy;
-        
-        E -= e * A + f * C;
-        F -= e * B + f * D;
-        
-        
-        
-        glyphimg[gi][index*9    ] = A/rx;
-        glyphimg[gi][index*9 + 1] = C/rx;
-        glyphimg[gi][index*9 + 2] = E/rx;
-        //glyphimg[gi][index*9 + 2] = -m02;
-        
-        glyphimg[gi][index*9 + 3] = B/ry;
-        glyphimg[gi][index*9 + 4] = D/ry;
-        glyphimg[gi][index*9 + 5] = F/ry;
-        //glyphimg[gi][index*9 + 5] = -m12;
-        
-        glyphimg[gi][index*9 + 6] = addsub;
-        glyphimg[gi][index*9 + 7] = 0.0;
-        
-
-        //println(a,b,c,d,e,f);
+        setElirect(gi,index,addsub,0.0,
+        cx,cy,
+        rx,ry,
+        a,c,e,
+        b,d,f);
         
         index ++;
       }
@@ -234,92 +180,19 @@ void setup(){
           d = 1.0;
         }
         
-        float determinant = a*d - c*b;
-        
-        /*
-        https://github.com/processing/processing-android/blob/master/core/src/processing/core/PMatrix2D.java
-        
-        translate
-        m02 = tx*m00 + ty*m01 + m02;
-        m12 = tx*m10 + ty*m11 + m12;
-        
-        invert
-  
-        float m02,m12;
-        e -= w+x;
-        f -= h+y;
-        m02 = (c * f - d * e) / determinant / w;
-        m12 = (b * e - a * f) / determinant / h;
-        
-        m02 = (t01 * t12 - t11 * t02) / determinant;
-        m12 = (t10 * t02 - t00 * t12) / determinant;
-        */
-        
         x+=w;
         y+=h;
         
-        //x+=e * a + f * c;
-        //y+=e * b + f * d;
-        //x+=w * a + h * c;
-        //y+=w * b + h * d;
-        
-        float m02,m12;
-        m02 = (c * f - d * e) / determinant;
-        m12 = (b * e - a * f) / determinant;
-        
-        float A,C,E,
-              B,D,F;
-              
-        A = d / determinant;
-        C = -c / determinant;
-        B = -b / determinant;
-        D = a / determinant;
-        
-        E=-x;
-        F=-y;
-        
-        E -= e * A + f * C;
-        F -= e * B + f * D;
-        
-        
-        
-        glyphimg[gi][index*9    ] = A/w;
-        glyphimg[gi][index*9 + 1] = C/w;
-        glyphimg[gi][index*9 + 2] = E/w;
-        //glyphimg[gi][index*9 + 2] = -m02;
-        
-        glyphimg[gi][index*9 + 3] = B/h;
-        glyphimg[gi][index*9 + 4] = D/h;
-        glyphimg[gi][index*9 + 5] = F/h;
-        //glyphimg[gi][index*9 + 5] = -m12;
-        
-        glyphimg[gi][index*9 + 6] = addsub;
-        glyphimg[gi][index*9 + 7] = 1.0;
-        //glyphimg[gi][index*9 + 8] = 0.0;
-        /*
-        print( "a["+index+"] = new_rect(");
-        print(a+","+b+","+c+","+d+","+t);
-        println(", 1.0);");
-        */
+        setElirect(gi,index,addsub,1.0,
+        x,y,
+        w,h,
+        a,c,e,
+        b,d,f);
         index ++;
       }
     }
-    for(int fill = index;fill<29;fill++){
-        glyphimg[gi][fill*9    ] = 1.;
-        glyphimg[gi][fill*9 + 1] = 1.;
-        glyphimg[gi][fill*9 + 2] = 1.;
-        
-        glyphimg[gi][fill*9 + 3] = 1.;
-        glyphimg[gi][fill*9 + 4] = 1.;
-        glyphimg[gi][fill*9 + 5] = 1.;
-        
-        glyphimg[gi][fill*9 + 6] = 1.0;
-        glyphimg[gi][fill*9 + 7] = 0.0;
-        glyphimg[gi][fill*9 + 8] = 0.0;
-      
-    }
-    
-    
+    for(int fill = index;fill<29;fill++)
+    setElirect(gi,fill,1,1,1,1,1,1,1,1,1,1,1,1);
     }
   }
   setfloatarray(blablabla,"glyphs",glyphimg);
