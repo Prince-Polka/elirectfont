@@ -6,6 +6,8 @@ precision mediump float;
 #endif
 
 uniform sampler2D glyphs;
+
+uniform vec2 u_mouse;
 uniform int u_seconds;
 
 float elirect(vec2 st, mat3 e, float background){
@@ -20,7 +22,7 @@ float elirect(vec2 st, mat3 e, float background){
     return mix(
         min(background,1.0-ret),
         max(background,ret),
-        addsub);;
+        addsub);
 }
 
 float ff(sampler2D sampler, int y_index , int x_index){
@@ -71,16 +73,12 @@ void main() {
 
     int g = 65-33 +u_seconds;
 
-    //g-=32;
-
-    //g-= int(st.y<250.0) *32;
-
-    //g += int( dot(st/vec2(100,200),vec2(1,5));
-
-    g += int(st.x/100);
+    g += int(dot(ivec2(st / u_mouse),ivec2(1)))  ;
 
 
-    st = mod(st, vec2(100,500) );
+    st = mod(st, u_mouse );
+
+    st*=vec2(100,210)/u_mouse;
 
     for(int i=0;i<29;i++) color = elirect(st, mat3fetch(glyphs,g,i) ,color);
 

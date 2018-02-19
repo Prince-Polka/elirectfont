@@ -124,7 +124,8 @@ void setup(){
   shader(blablabla);
 }
 void draw(){
-  int sec = frameCount/30;
+  int sec = frameCount/60;
+  blablabla.set("u_mouse",(float)mouseX,(float)mouseY);
   blablabla.set("u_seconds",sec%22 + 32 * int(sec<22)  );
   rect(0,0,width,height);
 }
