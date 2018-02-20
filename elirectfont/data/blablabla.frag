@@ -2,27 +2,37 @@
 // Title: blablabla
 
 #ifdef GL_ES
-precision mediump float;
+precision highp float;
 #endif
 
 uniform sampler2D glyphs;
 
-uniform vec2 u_mouse;
+uniform vec2 glyphsize;
 uniform int u_seconds;
 
-float elirect(vec2 st, mat3 e, float background){
-    st = (vec3(st,1) * e).xy;
+const vec4 rgbpitch = vec4(-.3334,0.0,0.3334,0.0);
 
-    float mode = e[2].y;
+const vec2 original_glyphsize = vec2(100,210);
 
-    float ret = mix(float( dot(st,st) < 1.0 ), // ellipse
-               float( abs(st.x) < 1.0 && abs(st.y) < 1.0), // rect
-               mode);
-    float addsub = e[2].x;
-    return mix(
-        min(background,1.0-ret),
-        max(background,ret),
-        addsub);
+float elirect(vec2 st, mat3 e, float bg){
+  st = (vec3(st,1)*e).xy;
+  st *= st;
+  st *= step(e[2].y,st);
+  return mix(e[2].x,bg,step(1.,st.x+st.y));
+}
+
+vec3 s3 (vec4 v, mat3 e, vec3 bg){
+  /* samples rgb individually for anti aliasing */
+  v = vec4(
+  dot( vec3(v.ra,1) ,e[0]),
+  dot( vec3(v.ga,1) ,e[0]),
+  dot( vec3(v.ba,1) ,e[0]),
+  dot( vec3(v.ga,1) ,e[1])
+  );
+  v *= v;
+  v *= step(e[2].y,v);
+  v.rgb+=v.a;
+  return mix(e[2].xxx,bg, step(1.,v.rgb) );
 }
 
 float ff(sampler2D sampler, int y_index , int x_index){
@@ -66,22 +76,38 @@ mat3 new_eli(float cx,float cy, float rx, float ry, float a, float b, float c, f
 
 void main() {
     vec2 st = gl_FragCoord.xy;
-
     st.y = 500.-st.y; // why is this needed? svg coordinate system is the same ?
 
-    float color = 0.0;
+    vec3 color = vec3(0.0,0.0,0.0); // IMPORTANT MUST BE 0.0
+    mat3 colors = mat3(0); // for AA
 
     int g = 65-33 +u_seconds;
 
-    g += int(dot(ivec2(st / u_mouse),ivec2(1)))  ;
+    vec2 ratio = original_glyphsize/glyphsize;
 
+    g += int(dot(ivec2(st / glyphsize),ivec2(1)))  ;
 
-    st = mod(st, u_mouse );
+    st = mod(st,glyphsize) * ratio;
 
-    st*=vec2(100,210)/u_mouse;
+    vec4 v = st.xxxy + rgbpitch * ratio.x;
 
-    for(int i=0;i<29;i++) color = elirect(st, mat3fetch(glyphs,g,i) ,color);
+    mat4 ys = mat4(
+      -0.333,0.0,0.333,-0.333,
+      -0.333,0.0,0.333, 0.0,
+      -0.333,0.0,0.333,-0.333,
+      0.0,0.0,0.0,0.0
+      )*ratio.x;
 
+    for(int i=0;i<29;i++){
+    mat3 m = mat3fetch(glyphs,g,i);
+    //color = vec3(elirect(st,m,color.g));
 
-    gl_FragColor = vec4(vec3(color),1.0);
+    // anti alias , with artifacts
+    for(int s = 0;s<3;s++)
+    colors[s] = s3(v+ys[s],m,colors[s]);
+    }
+
+    color = ( colors[0] + colors[1] + colors[2] )*0.3334;
+
+    gl_FragColor = vec4(color,1.0);
 }
