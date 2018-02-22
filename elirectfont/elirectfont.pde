@@ -3,7 +3,7 @@ XML shape;
 XML[] glyphs,shapes,components;
 int index = 0;
 int gi = 0; // glyph index
-PShader blablabla;
+PShader elirect_shader;
 
 float[][] glyphimg = new float[96][9*29];
 
@@ -21,7 +21,7 @@ void setfloatarray(PShader target, String sampler2Dname, float[][] source){
 
 void setup(){
   size(500,500,P2D);
-  blablabla = loadShader("elirect.frag");
+  elirect_shader = loadShader("elirect.frag");
   font = loadXML("elirect.svg");
   glyphs = font.getChildren("g");
   for (int i = 0; i < glyphs.length; i++) {
@@ -123,12 +123,12 @@ void setup(){
     1,0,0,1,-10,-10);
     }
   }
-  setfloatarray(blablabla,"glyphs",glyphimg);
-  shader(blablabla);
+  setfloatarray(elirect_shader,"glyphs",glyphimg);
+  shader(elirect_shader);
 }
 void draw(){
   int sec = frameCount/60;
-  blablabla.set("glyphsize",(float)mouseX*0.1,(float)mouseX*0.21);
-  blablabla.set("u_seconds",sec%22 + 32 * int(sec<22)  );
+  elirect_shader.set("glyphsize",(float)mouseX*0.1,(float)mouseX*0.21);
+  elirect_shader.set("u_seconds",sec%22 + 32 * int(sec<22)  );
   rect(0,0,width,height);
 }
