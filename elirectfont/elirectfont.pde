@@ -21,8 +21,8 @@ void setfloatarray(PShader target, String sampler2Dname, float[][] source){
 
 void setup(){
   size(500,500,P2D);
-  blablabla = loadShader("blablabla.frag");
-  font = loadXML("AZazlayered.svg");
+  blablabla = loadShader("elirect.frag");
+  font = loadXML("elirect.svg");
   glyphs = font.getChildren("g");
   for (int i = 0; i < glyphs.length; i++) {
     String id = glyphs[i].getString("inkscape:label");
