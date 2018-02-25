@@ -76,6 +76,7 @@ void setup(){
         else if(t!=null && t.contains("rotate") ){
         t = t.substring(7,t.length()-1);
         abcd = t.split(",");
+        println(id);
         a = Float.parseFloat(abcd[0]);
         b = Float.parseFloat(abcd[1]);
         c = Float.parseFloat(abcd[2]);
@@ -127,8 +128,10 @@ void setup(){
   shader(elirect_shader);
 }
 void draw(){
-  int sec = frameCount/60;
+  //int sec = frameCount/60;
   elirect_shader.set("glyphsize",(float)mouseX*0.1,(float)mouseX*0.21);
-  elirect_shader.set("u_seconds",sec%22 + 32 * int(sec<22)  );
+  elirect_shader.set("u_resolution",(float)width,(float)height);
+  //println((float)mouseX*0.1,(float)mouseX*0.21);
+  //elirect_shader.set("u_seconds",sec%22 + 32 * int(sec<22)  );
   rect(0,0,width,height);
 }

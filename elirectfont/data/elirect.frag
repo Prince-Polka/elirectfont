@@ -8,7 +8,7 @@ precision mediump float;
 uniform sampler2D glyphs;
 
 uniform vec2 glyphsize;
-uniform int u_seconds;
+uniform vec2 u_resolution;
 
 const mat3 pitch = mat3(
 -0.4444,-0.1111,0.2222,
@@ -44,54 +44,53 @@ ff(s,y,x+6),ff(s,y,x+7),ff(s,y,x+8)
 
 void main() {
     vec2 st = gl_FragCoord.xy;
-    st.y = 500.-st.y; // why is this needed? svg coordinate system is the same ?
+    st.y = u_resolution.y-st.y; // why is this needed? svg coordinate system is the same ?
 
     vec3 color = vec3(0.0,0.0,0.0); // IMPORTANT MUST BE 0.0
     vec3 colors[9] = {color,color,color,
                       color,color,color,
                       color,color,color}; // for AA
 
-
-    int g = 65-33 +u_seconds;
-
     vec2 ratio = original_glyphsize/glyphsize;
 
-    g += int(dot(ivec2(st / glyphsize),ivec2(1)))  ;
-
+    int g = int(dot( floor(st/glyphsize) , vec2(1.0,floor(u_resolution.x/glyphsize.x))));
     st = mod(st,glyphsize) * ratio;
-
-    vec3 vp = st.y + pitch[1] * ratio.x;
-    mat3 oosam = st.x + pitch * ratio.x;
+    mat3 AB = st.x + pitch * ratio.x;
+    vec3 CDEF = st.y + pitch[1] * ratio.x;
 
     for(int i=0;i<29;i++){
-    mat3 e = mat3fetch(glyphs,g,i);
+    mat3
+    e = mat3fetch(glyphs,g,i),
+    A = AB * e[0].x,
+    B = AB * e[1].x,
+    ACE,
+    BDF;
+
+    vec3
+    addsub = e[2].xxx,
+    CE = CDEF * e[0].y + e[0].z,
+    DF = CDEF * e[1].y + e[1].z;
+
     float mode = e[2].y;
-    vec3 addsub = e[2].xxx;
-
-    vec3 vpx = vp * e[0].y + e[0].z;
-    vec3 vpy = vp * e[1].y + e[1].z;
-
-    mat3 samX, samY, osamX, osamY;
-    osamX = oosam * e[0].x;
-    osamY = oosam * e[1].x;
-
     int s = 0;
 
     for(int ve=0;ve<3;ve++){
-      samX = osamX + vpx[ve];
-      samX = matrixCompMult(samX,samX);
-      samX[0] *= step( mode , samX[0] );
-      samX[1] *= step( mode , samX[1] );
-      samX[2] *= step( mode , samX[2] );
-      samY = osamY + vpy[ve];
-      samY = matrixCompMult(samY,samY);
-      samY[0] *= step( mode , samY[0] );
-      samY[1] *= step( mode , samY[1] );
-      samY[2] *= step( mode , samY[2] );
-      samX += samY;
-      colors[s] = mix(addsub,colors[s],step( 1.0 , samX[0] ) ); s++;
-      colors[s] = mix(addsub,colors[s],step( 1.0 , samX[1] ) ); s++;
-      colors[s] = mix(addsub,colors[s],step( 1.0 , samX[2] ) ); s++;
+      ACE = A + CE[ve];
+      ACE = matrixCompMult(ACE,ACE);
+      ACE[0] *= step( mode , ACE[0] );
+      ACE[1] *= step( mode , ACE[1] );
+      ACE[2] *= step( mode , ACE[2] );
+
+      BDF = B + DF[ve];
+      BDF = matrixCompMult(BDF,BDF);
+      BDF[0] *= step( mode , BDF[0] );
+      BDF[1] *= step( mode , BDF[1] );
+      BDF[2] *= step( mode , BDF[2] );
+
+      ACE += BDF;
+      colors[s] = mix(addsub,colors[s],step( 1.0 , ACE[0] ) ); s++;
+      colors[s] = mix(addsub,colors[s],step( 1.0 , ACE[1] ) ); s++;
+      colors[s] = mix(addsub,colors[s],step( 1.0 , ACE[2] ) ); s++;
     }
 
     }
