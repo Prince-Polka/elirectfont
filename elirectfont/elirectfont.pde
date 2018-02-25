@@ -76,7 +76,7 @@ void setup(){
         else if(t!=null && t.contains("rotate") ){
         t = t.substring(7,t.length()-1);
         abcd = t.split(",");
-        println(id);
+        println(id,iseli);
         a = Float.parseFloat(abcd[0]);
         b = Float.parseFloat(abcd[1]);
         c = Float.parseFloat(abcd[2]);
